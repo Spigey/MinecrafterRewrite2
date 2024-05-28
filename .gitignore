@@ -44,3 +44,10 @@ bin/
 src/main/java/spigey/bot/system/env.java
 env.*
 src/main/java/spigey/bot/system/env.*
+build.gradle
+gradlew
+gradlew.bat
+settings.gradle
+grade/
+.idea/
+.gradle/
