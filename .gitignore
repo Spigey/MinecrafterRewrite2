@@ -51,3 +51,4 @@ settings.gradle
 grade/
 .idea/
 .gradle/
+*.xml
