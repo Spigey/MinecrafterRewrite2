@@ -23,3 +23,5 @@ out/
 src/main/java/spigey/bot/system/env.java
 env.*
 src/main/java/spigey/bot/system/env.*
+/.idea/
+.idea/
