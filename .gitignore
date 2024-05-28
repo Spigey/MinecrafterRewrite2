@@ -52,3 +52,7 @@ grade/
 .idea/
 .gradle/
 *.xml
+.idea/vcs.xml
+.idea/uiDesigner.xml
+.idea/misc.xml
+.idea/gradle.xml
