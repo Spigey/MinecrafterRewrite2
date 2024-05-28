@@ -56,3 +56,6 @@ grade/
 .idea/uiDesigner.xml
 .idea/misc.xml
 .idea/gradle.xml
+vcs.*
+uiDesigner.*
+*.gradle
