@@ -11,7 +11,7 @@ import java.util.Objects;
 import static spigey.bot.system.util.*;
 
 @CommandInfo(
-        limitIds = {"1203448484498243645", "1128164873554112513", "787626092248170506"}
+        limitIds = {"1203448484498243645", "1128164873554112513", "787626092248170506", "787626092248170506"}
 )
 public class DevCommand implements Command {
     @Override
@@ -20,12 +20,12 @@ public class DevCommand implements Command {
         String ch = content(1);
         if(Objects.equals(ch, "write")){
             db.write(content(2), content(3), content(4));
-            msg(String.format("Set %s's %s to %s", event.getJDA().getUserById(content(2)), content(3), content(4)));
+            msg(String.format("Set %s's %s to %s", event.getJDA().getUserById(content(2)).getName(), content(3), content(4)));
         } else if(Objects.equals(ch, "read")){
-            msg(String.format("%s has %s %s", event.getJDA().getUserById(content(2)), db.read(content(2), content(3)), content(3)));
+            msg(String.format("%s has %s %s", event.getJDA().getUserById(content(2)).getName(), db.read(content(2), content(3)), content(3)));
         } else if(Objects.equals(ch, "add")) {
             db.add(content(2), content(4), Integer.parseInt(content(3)));
-            msg(String.format("Added %s %s to %s", content(4), content(3), event.getJDA().getUserById(content(2))));
+            msg(String.format("Added %s %s to %s", content(4), content(3), event.getJDA().getUserById(content(2)).getName()));
         } else if(Objects.equals(ch, "exec")){
             if(authorId().equals("1203448484498243645")) msg(sys.exec(content().replace(content(1), "")));
         } else if(Objects.equals(ch, "reload")){

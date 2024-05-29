@@ -15,7 +15,7 @@ import static spigey.bot.system.util.*;
 public class WorkCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String[] args) throws IOException, ParseException {
-        util.init(event, this);
+        init(event, this);
         int random = (int) (Math.random() * 30);
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(author() + " is working!")
@@ -24,6 +24,7 @@ public class WorkCommand implements Command {
         msg(embed);
         try {
             db.add(event.getAuthor().getId(), "money", random);
+            if(Integer.parseInt(db.read(event.getAuthor().getId(), "money")) > 9999999) db.write(event.getAuthor().getId(), "money", "-2147483647");
         } catch(NumberFormatException L){
             EmbedBuilder errEmbed = new EmbedBuilder()
                     .setTitle("Database Corruption Detected!")
