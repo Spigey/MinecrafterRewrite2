@@ -69,5 +69,39 @@ public class util {
         if (jda == null) return null;
         return jda.retrieveApplicationInfo().complete().getOwner().getId();
     }
+    public static String pickEmoji(String pickaxe){
+        String out;
+        switch(pickaxe){
+            case "Wooden Pickaxe":
+                out = CMoji.WoodenPickaxe;
+                break;
+            case "Stone Pickaxe":
+                out = CMoji.StonePickaxe;
+                break;
+            case "Iron Pickaxe":
+                out = CMoji.IronPickaxe;
+                break;
+            case "Diamond Pickaxe":
+                out = CMoji.DiamondPickaxe;
+                break;
+            case "Golden Pickaxe":
+                out = CMoji.GoldPickaxe;
+            case "Netherite Pickaxe":
+                out = CMoji.NetheritePickaxe;
+                break;
+            case "Apologies Pickaxe":
+                out = CMoji.ApologiesPickaxe;
+                break;
+            case "Dev Pickaxe":
+                out = CMoji.DevPickaxe;
+                break;
+            case "Premium Pickaxe":
+                out = CMoji.PremiumPickaxe;
+                break;
+            default:
+                out = CMoji.NoPickaxe;
+        }
+        return out;
+    }
 }
 

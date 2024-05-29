@@ -6,17 +6,18 @@ import spigey.bot.system.*;
 
 import java.io.IOException;
 
-import static spigey.bot.system.util.author;
-import static spigey.bot.system.util.msg;
+import static spigey.bot.system.util.*;
 
 public class BalCommand implements Command {
+    String user;
     @Override
     public void execute(MessageReceivedEvent event, String[] args) throws IOException, ParseException {
         util.init(event, this);
+        String chest_pickaxe = db.read(event.getAuthor().getId(), "chest_pickaxe");
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(author() + "'s Inventory")
-                .addField("Inventory", db.read(event.getAuthor().getId(), "money") + " " + CMoji.Cool, false)
-                .addField("Chest", db.read(event.getAuthor().getId(), "chest") + " " + CMoji.Cool, false)
+                .addField("Inventory",  " asd" + CMoji.Cool, false)
+                .addField("Chest", String.format("**Gold**: %s %s\n**Pickaxe**: %s %s *(%s)*",db.read(event.getAuthor().getId(), "chest"), CMoji.Gold, chest_pickaxe, pickEmoji(chest_pickaxe), db.read(event.getAuthor().getId(), "chest_pickaxe_multiplier")), false)
                 .setColor(EmbedColor.BLURPLE);
         msg(embed);
     }

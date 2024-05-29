@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static spigey.bot.DiscordBot.prefix;
+import static spigey.bot.system.sys.errInfo;
 import static spigey.bot.system.util.debug;
 
 public class CommandHandler {
@@ -91,7 +92,7 @@ public class CommandHandler {
                     CooldownManager cooldownManager = cooldownManagers.get(resolvedCommandName);
                     if (cooldownManager != null && cooldownManager.isActive(event.getAuthor())) {
                         String remainingCooldown = cooldownManager.parse(event.getAuthor());
-                        event.getChannel().sendMessage("You must wait " + remainingCooldown + " before using this command again.").queue();
+                        event.getChannel().sendMessage("You have to wait " + remainingCooldown + " before using this command again.").queue();
                         return;
                     } else if (cooldownManager != null) {
                         cooldownManager.update(event.getAuthor());
@@ -100,7 +101,7 @@ public class CommandHandler {
 
                 command.execute(event, args);
             } catch (Exception e) {
-                // Error handling
+                errInfo(e);
             }
         }
     }
