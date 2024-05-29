@@ -6,12 +6,13 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 import static spigey.bot.system.util.log;
 
 public class db {
-    private static String defaultValue = null;
-    private static final String FILE_PATH = "database.json";
+    private static String defaultValue = "temp";
+    private static final String FILE_PATH = "src/main/java/spigey/bot/system/database/database.json";
 
     public static void write(String user, String key, String value) throws IOException, ParseException {
         JSONObject existingData = (JSONObject) new JSONParser().parse(new FileReader(FILE_PATH));
@@ -52,7 +53,7 @@ public class db {
         return defaultValue;
     }
     public static void add(String user, String key, int value) throws IOException, ParseException {
-        if(read(user, key) == null){
+        if(Objects.equals(read(user, key), getDefaultValue())){
             log("Adding key " + key + " to user " + user);
             write(user, key, String.valueOf(value));
             return;
