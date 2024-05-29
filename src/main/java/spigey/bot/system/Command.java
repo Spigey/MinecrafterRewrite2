@@ -6,5 +6,5 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 
 public interface Command {
-    void execute(MessageReceivedEvent event, String[] args) throws IOException, ParseException;
+    void execute(MessageReceivedEvent event, String[] args) throws IOException, ParseException, InterruptedException;
 }
