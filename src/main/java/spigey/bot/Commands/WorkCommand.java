@@ -9,17 +9,13 @@ import java.io.IOException;
 
 import static spigey.bot.system.util.*;
 @CommandInfo(
-        aliases = {"mine"}
+        aliases = {"mine"},
+        cooldown = 30000
 )
 public class WorkCommand implements Command {
-    private final CooldownManager cooldown = new CooldownManager(30000);
     @Override
     public void execute(MessageReceivedEvent event, String[] args) throws IOException, ParseException {
         util.init(event, this);
-        if(cooldown.isActive(event.getAuthor())){
-            msg("You have to wait " + cooldown.parse(event.getAuthor()) + " before working again!");
-            return;
-        }
         int random = (int) (Math.random() * 30);
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(author() + " is working!")
@@ -40,6 +36,5 @@ public class WorkCommand implements Command {
 
             db.write(event.getAuthor().getId(), "money", "0");
         }
-        cooldown.update(event.getAuthor());
     }
 }

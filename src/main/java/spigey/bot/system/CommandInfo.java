@@ -13,4 +13,5 @@ public @interface CommandInfo {
     String[] limitIds() default {};
     String description() default "";
     String limitMsg() default "You are not allowed to use this command!";
+    long cooldown() default 0;
 }

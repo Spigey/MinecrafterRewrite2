@@ -17,6 +17,7 @@ import static spigey.bot.system.util.debug;
 public class CommandHandler {
     private final Map<String, Command> commands = new HashMap<>();
     private final Map<String, String> aliasToCommandMap = new HashMap<>();
+    private final Map<String, CooldownManager> cooldownManagers = new HashMap<>();
 
     public CommandHandler() {
         loadCommands();
@@ -45,6 +46,11 @@ public class CommandHandler {
                             debug("Registered alias " + alias + " for command " + className, false);
                             aliasToCommandMap.put(alias.toLowerCase(), commandName);
                         }
+
+                        // Register cooldown manager
+                        if (info.cooldown() > 0) {
+                            cooldownManagers.put(commandName, new CooldownManager(info.cooldown()));
+                        }
                     }
                 }
             }
@@ -56,6 +62,7 @@ public class CommandHandler {
     public void reloadCommands() {
         commands.clear();
         aliasToCommandMap.clear();
+        cooldownManagers.clear();
         loadCommands();
     }
 
@@ -71,7 +78,26 @@ public class CommandHandler {
             String[] args = new String[split.length - 1];
             System.arraycopy(split, 1, args, 0, args.length);
             try {
-                if(command.getClass().isAnnotationPresent(CommandInfo.class) && command.getClass().getAnnotation(CommandInfo.class).limitIds().length > 0 && !Arrays.asList(command.getClass().getAnnotation(CommandInfo.class).limitIds()).contains(event.getAuthor().getId())){event.getChannel().sendMessage(command.getClass().getAnnotation(CommandInfo.class).limitMsg()).queue(); return;}
+                if (command.getClass().isAnnotationPresent(CommandInfo.class)) {
+                    CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
+
+                    // Check if user is limited
+                    if (info.limitIds().length > 0 && !Arrays.asList(info.limitIds()).contains(event.getAuthor().getId())) {
+                        event.getChannel().sendMessage(info.limitMsg()).queue();
+                        return;
+                    }
+
+                    // Check cooldown
+                    CooldownManager cooldownManager = cooldownManagers.get(resolvedCommandName);
+                    if (cooldownManager != null && cooldownManager.isActive(event.getAuthor())) {
+                        String remainingCooldown = cooldownManager.parse(event.getAuthor());
+                        event.getChannel().sendMessage("You must wait " + remainingCooldown + " before using this command again.").queue();
+                        return;
+                    } else if (cooldownManager != null) {
+                        cooldownManager.update(event.getAuthor());
+                    }
+                }
+
                 command.execute(event, args);
             } catch (Exception e) {
                 // Error handling
