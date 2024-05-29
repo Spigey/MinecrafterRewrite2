@@ -10,6 +10,7 @@ import static spigey.bot.system.util.*;
 
 public class WorkCommand implements Command {
     private final CooldownManager cooldown = new CooldownManager(30000);
+    public static final String[] ALIASES = {"mine", "ermm"};
     @Override
     public void execute(MessageReceivedEvent event, String[] args) throws IOException, ParseException {
         util.init(event, this);

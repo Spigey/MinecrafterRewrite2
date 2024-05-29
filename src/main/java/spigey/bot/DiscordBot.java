@@ -18,8 +18,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static spigey.bot.system.util.debug;
-import static spigey.bot.system.util.log;
+import static spigey.bot.system.util.*;
+import static spigey.bot.system.util.msg;
 
 public class DiscordBot extends ListenerAdapter {
     static CommandHandler commandHandler;
@@ -40,6 +40,12 @@ public class DiscordBot extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        commandHandler.onMessageReceived(event);
+        try {
+            commandHandler.onMessageReceived(event);
+        } catch (Exception e) {
+            util.init(event, this);
+            error("An error has occurred while executing Command:\n" + e + "\nMessage: " + event.getMessage().getContentRaw(), false);
+            msg("An error occurred while executing Command: ```" + (e.toString().length() > 1000 ? e.toString().substring(0, 1000) + "..." : e) + "```");
+        }
     }
 }
