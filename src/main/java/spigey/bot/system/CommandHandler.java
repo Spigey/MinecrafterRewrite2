@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static spigey.bot.DiscordBot.prefix;
 import static spigey.bot.system.util.*;
 
 public class CommandHandler {
@@ -53,7 +54,7 @@ public class CommandHandler {
                 command.execute(event, args);
             } catch (Exception e) {
                 util.init(event, this);
-                error("An error has occurred while executing " + command.getClass().getSimpleName() + ":\n" + e + "\nMessage: " + content(), false);
+                error("An error has occurred while executing " + command.getClass().getSimpleName() + ":\n" + e + "\nMessage: " + event.getMessage().getContentRaw(), false);
                 msg("An error occurred while executing " + command.getClass().getSimpleName() + ": ```" + (e.toString().length() > 1000 ? e.toString().substring(0, 1000) + "..." : e) + "```");
             }
         }
