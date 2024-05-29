@@ -1,13 +1,25 @@
 package spigey.bot.system;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.json.simple.parser.ParseException;
 import spigey.bot.DiscordBot;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,9 +69,9 @@ public class CommandHandler {
         }
     }
 
-    public void doTheActualShit(MessageReceivedEvent event) {
+    public void doTheActualShit(MessageReceivedEvent event) throws IOException {
         String[] split = event.getMessage().getContentRaw().split(" ");
-        if (!split[0].startsWith(DiscordBot.prefix)) return;
+        if (!split[0].startsWith(prefix)) return;
 
         String commandName = split[0].substring(1).toLowerCase();
         String resolvedCommandName = aliasToCommandMap.getOrDefault(commandName, commandName);
@@ -71,9 +83,23 @@ public class CommandHandler {
             try {
                 command.execute(event, args);
             } catch (Exception e) {
-                util.init(event, this);
-                util.error("An error has occurred while executing " + command.getClass().getSimpleName() + ":\n" + e + "\nMessage: " + event.getMessage().getContentRaw(), false);
-                util.msg("An error occurred while executing " + command.getClass().getSimpleName() + ": ```" + (e.toString().length() > 1000 ? e.toString().substring(0, 1000) + "..." : e) + "```");
+                init(event, this);
+                StringBuilder err = new StringBuilder(e + "\n   ");
+                for(int i = 0; i < e.getStackTrace().length - 1; i++){
+                    err.append(e.getStackTrace()[i]).append("\n   ");
+                }
+                err.append(e.getStackTrace()[e.getStackTrace().length - 1]);
+                error("An error has occurred while executing " + command.getClass().getSimpleName() + ":\n" + e + "\nMessage: " + event.getMessage().getContentRaw(), false);
+                msg("An error occurred while executing " + command.getClass().getSimpleName() + ": ```" + (err.toString().length() > 1000 ? err.substring(0, 1000) + "..." : err.toString()) + "```\nThis error has been automatically reported.");
+                TextChannel channel = event.getJDA().getGuildById("1211627879243448340").getTextChannelById("1245302943951880303");
+                MessageEmbed embed = new EmbedBuilder()
+                        .setTitle("Error Report")
+                        .setDescription(String.format("Message: ```%s```\nAuthor Username: `%s`\nAuthor ID: `%s`",event.getMessage().getContentRaw(), event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator(), event.getAuthor().getId()))
+                        .setColor(EmbedColor.RED)
+                        .build();
+                Path temp = Files.createTempFile("error", ".txt");
+                Files.writeString(temp, err);
+                channel.sendMessage("<@" + event.getJDA().retrieveApplicationInfo().complete().getOwner().getId() + ">").addEmbeds(embed).addFiles(FileUpload.fromData(err.toString().getBytes(StandardCharsets.UTF_8), "error_report.txt")).queue();
             }
         }
     }
