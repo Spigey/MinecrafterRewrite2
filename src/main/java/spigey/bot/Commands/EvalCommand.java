@@ -15,6 +15,6 @@ public class EvalCommand implements Command {
         util.init(event, this);
         text = content();
         if(!event.getAuthor().getId().equals("1203448484498243645")){msg("fuck nuh uh"); return;}
-        throw new RuntimeException(text);
+        msg(content(1));
     }
 }

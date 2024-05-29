@@ -13,7 +13,14 @@ public class util {
         classs = Class;
     }
     public static String content(){
+        if(eventt.getMessage().getContentRaw().length() < (classs.getClass().getSimpleName().replace("Command","").length() + prefix.length() + 1)) return "";
         return eventt.getMessage().getContentRaw().substring((classs.getClass().getSimpleName().replace("Command","").length() + prefix.length() + 1));
+    }
+    public static String content(int index){
+        String out;
+        try{out = eventt.getMessage().getContentRaw().split(" ")[index];}
+        catch(Exception L){return null;}
+        return eventt.getMessage().getContentRaw().split(" ")[index];
     }
     public static void msg(String content){
         if(content == null) {eventt.getChannel().sendMessage("null").queue(); return;}
