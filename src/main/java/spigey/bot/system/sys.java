@@ -1,7 +1,9 @@
 package spigey.bot.system;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public class sys {
@@ -27,11 +29,19 @@ public class sys {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
-    public static void exec(String cmd){
+    public static String exec(String cmd){
         try {
-            new ProcessBuilder("cmd", "/c", cmd).inheritIO().start().waitFor();
+            Process proc = new ProcessBuilder("cmd", "/c", cmd).redirectErrorStream(true).start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+            return output.toString();
         } catch(Exception L){
             errInfo(L);
+            return null;
         }
     }
     public static String getUserInput(String message) {

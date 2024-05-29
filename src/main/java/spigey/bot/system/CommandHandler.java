@@ -1,41 +1,28 @@
 package spigey.bot.system;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.json.simple.parser.ParseException;
-import spigey.bot.DiscordBot;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import static spigey.bot.DiscordBot.prefix;
-import static spigey.bot.system.util.*;
+import static spigey.bot.system.util.debug;
 
 public class CommandHandler {
     private final Map<String, Command> commands = new HashMap<>();
     private final Map<String, String> aliasToCommandMap = new HashMap<>();
 
     public CommandHandler() {
-        registerCommands();
+        loadCommands();
     }
 
-    private void registerCommands() {
+    private void loadCommands() {
         try {
             debug("Registering commands", false);
             String path = "spigey/bot/Commands";
@@ -51,22 +38,25 @@ public class CommandHandler {
                     debug("Registered command " + className, false);
                     commands.put(commandName, command);
 
-                    // Register aliases
-                    try {
-                        Field aliasesField = cls.getDeclaredField("ALIASES");
-                        aliasesField.setAccessible(true);
-                        String[] aliases = (String[]) aliasesField.get(null);
-                        for (String alias : aliases) {
+                    // Read annotations
+                    if (cls.isAnnotationPresent(CommandInfo.class)) {
+                        CommandInfo info = cls.getAnnotation(CommandInfo.class);
+                        for (String alias : info.aliases()) {
                             debug("Registered alias " + alias + " for command " + className, false);
                             aliasToCommandMap.put(alias.toLowerCase(), commandName);
                         }
-                    } catch (NoSuchFieldException e) {
                     }
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
+    }
+
+    public void reloadCommands() {
+        commands.clear();
+        aliasToCommandMap.clear();
+        loadCommands();
     }
 
     public void doTheActualShit(MessageReceivedEvent event) throws IOException {
@@ -81,25 +71,10 @@ public class CommandHandler {
             String[] args = new String[split.length - 1];
             System.arraycopy(split, 1, args, 0, args.length);
             try {
+                if(command.getClass().isAnnotationPresent(CommandInfo.class) && command.getClass().getAnnotation(CommandInfo.class).limitIds().length > 0 && !Arrays.asList(command.getClass().getAnnotation(CommandInfo.class).limitIds()).contains(event.getAuthor().getId())){event.getChannel().sendMessage(command.getClass().getAnnotation(CommandInfo.class).limitMsg()).queue(); return;}
                 command.execute(event, args);
             } catch (Exception e) {
-                init(event, this);
-                StringBuilder err = new StringBuilder(e + "\n   ");
-                for(int i = 0; i < e.getStackTrace().length - 1; i++){
-                    err.append(e.getStackTrace()[i]).append("\n   ");
-                }
-                err.append(e.getStackTrace()[e.getStackTrace().length - 1]);
-                error("An error has occurred while executing " + command.getClass().getSimpleName() + ":\n" + e + "\nMessage: " + event.getMessage().getContentRaw(), false);
-                msg("An error occurred while executing " + command.getClass().getSimpleName() + ": ```" + (err.toString().length() > 1000 ? err.substring(0, 1000) + "..." : err.toString()) + "```\nThis error has been automatically reported.");
-                TextChannel channel = event.getJDA().getGuildById("1211627879243448340").getTextChannelById("1245302943951880303");
-                MessageEmbed embed = new EmbedBuilder()
-                        .setTitle("Error Report")
-                        .setDescription(String.format("Message: ```%s```\nAuthor Username: `%s`\nAuthor ID: `%s`",event.getMessage().getContentRaw(), event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator(), event.getAuthor().getId()))
-                        .setColor(EmbedColor.RED)
-                        .build();
-                Path temp = Files.createTempFile("error", ".txt");
-                Files.writeString(temp, err);
-                channel.sendMessage("<@" + event.getJDA().retrieveApplicationInfo().complete().getOwner().getId() + ">").addEmbeds(embed).addFiles(FileUpload.fromData(err.toString().getBytes(StandardCharsets.UTF_8), "error_report.txt")).queue();
+                // Error handling
             }
         }
     }
