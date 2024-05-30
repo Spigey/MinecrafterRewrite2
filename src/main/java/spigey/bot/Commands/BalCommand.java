@@ -16,7 +16,7 @@ public class BalCommand implements Command {
         String chest_pickaxe = db.read(event.getAuthor().getId(), "chest_pickaxe");
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(author() + "'s Inventory")
-                .addField("Inventory",  " asd" + CMoji.Cool, false)
+                .addField("Inventory", String.format("**Gold**: %s %s\n**Pickaxe**: %s %s *(%s)*",db.read(event.getAuthor().getId(), "money"), CMoji.Gold, chest_pickaxe, pickEmoji(chest_pickaxe), db.read(event.getAuthor().getId(), "pickaxe_multiplier")), false)
                 .addField("Chest", String.format("**Gold**: %s %s\n**Pickaxe**: %s %s *(%s)*",db.read(event.getAuthor().getId(), "chest"), CMoji.Gold, chest_pickaxe, pickEmoji(chest_pickaxe), db.read(event.getAuthor().getId(), "chest_pickaxe_multiplier")), false)
                 .setColor(EmbedColor.BLURPLE);
         msg(embed);
