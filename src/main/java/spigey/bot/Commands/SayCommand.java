@@ -10,7 +10,6 @@ public class SayCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
         util.init(event, this);
-        // msg(env.TOKEN);
         msg(content());
     }
 }

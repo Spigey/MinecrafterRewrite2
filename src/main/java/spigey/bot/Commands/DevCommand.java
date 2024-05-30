@@ -1,4 +1,5 @@
 package spigey.bot.Commands;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.simple.parser.ParseException;
 import spigey.bot.system.Command;
@@ -32,5 +33,8 @@ public class DevCommand implements Command {
             new CommandHandler().reloadCommands();
             msg("Reloading commands");
         }
+    }
+    public void slashCommand(SlashCommandInteractionEvent event, String[] args){
+
     }
 }
